@@ -15,6 +15,8 @@ const CASTLE_QUEENSIDE = 1 << 3;
 const EN_PASSANT = 1 << 4;
 const CHECK = 1 << 5;
 const CHECKMATE = 1 << 6;
+const STALEMATE = 1 << 7;
+const PROMOTION = 1 << 8;
 
 const EMPTY = 1 << 0;
 const BLACK = 1 << 1;
@@ -83,8 +85,10 @@ class Chess {
         // 2. e2e4 f7f5
         // 3. Bf1xb5 Nc6xd4
         // 4. Qd1xd4
-        const pairs = pgn.split("\n");
-        const tokens = pairs.reduce((acc, pair) => [...acc, ...pair.split(" ").slice(1, 3)], []);
+        // const pairs = pgn.split("\n");
+        // const tokens = pairs.reduce((acc, pair) => [...acc, ...pair.split(" ").slice(1, 3)], []);
+        const tokens = pgn.match(/([a-h][1-8]x?)+|(O-O)|(O-O-O)/g) || [];
+        console.log(tokens);
         for (const token of tokens) {
             let found = false;
             const legalMoves = this.legalMoves(this.turn());
@@ -109,9 +113,9 @@ class Chess {
                     }
                 }
             } else {
-                const letters = [...token].filter(x => !/[x+#BNRQK]/.test(x));
+                const letters = token;
                 const [xi, xj] = Chess.coordIJ(letters.slice(0, 2));
-                const [yi, yj] = Chess.coordIJ(letters.slice(2, 4));
+                const [yi, yj] = Chess.coordIJ(letters.slice(-2));
                 for (const move of legalMoves) {
                     if (move[0][0] != xi) continue;
                     if (move[0][1] != xj) continue;
@@ -270,8 +274,14 @@ class Chess {
             if (this.board[xi][xj] & EMPTY) throw new Error("cannot move empty square");
             this.board[yi][yj] = this.board[xi][xj] | MOVED;
             // TODO: promotion
-            if ((this.board[yi][yj] & (WHITE | PAWN)) == (WHITE | PAWN) && yi == 0) this.board[yi][yj] = WHITE | QUEEN | MOVED;
-            if ((this.board[yi][yj] & (BLACK | PAWN)) == (BLACK | PAWN) && yi == 7) this.board[yi][yj] = BLACK | QUEEN | MOVED;
+            if ((this.board[yi][yj] & (WHITE | PAWN)) == (WHITE | PAWN) && yi == 0) {
+                this.stack[this.stack.length - 1][0][3] |= PROMOTION;
+                this.board[yi][yj] = WHITE | QUEEN | MOVED;
+            }
+            if ((this.board[yi][yj] & (BLACK | PAWN)) == (BLACK | PAWN) && yi == 7) {
+                this.stack[this.stack.length - 1][0][3] |= PROMOTION;
+                this.board[yi][yj] = BLACK | QUEEN | MOVED;
+            }
             this.board[xi][xj] = EMPTY;
         }
         if (this.inCheck(this.turn())) {
@@ -343,7 +353,6 @@ class Chess {
 
         const pawnPushWeight = 0.2 * (1 + this.stack.length / 30);
 
-        console.log("pawn push weight", pawnPushWeight);
 
         let pawn = 0;
         for (let i = 0; i < 8; i++) {
@@ -496,7 +505,6 @@ class Chess {
         // damp = 1 -> only material
 
         const damp = 1 - (0.3 / (Math.floor(this.stack.length / 2) * 0.9 + 1));
-        console.log("damp", damp);
 
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
@@ -913,6 +921,10 @@ class Chess {
     }
 
     getPoints(pre) {
+        if (typeof pre == "undefined") {
+            return this.getPoints(WHITE) - this.getPoints(BLACK);
+        }
+
         let points = 0;
 
         const values = {
@@ -945,7 +957,7 @@ class Chess {
     }
 
     getDepth() {
-        const mn = Math.min(10, Math.sqrt(this.getPoints(WHITE) * this.getPoints(BLACK)));
+        const mn = Math.max(3, Math.min(10, Math.sqrt(this.getPoints(WHITE) * this.getPoints(BLACK))));
         const b_estimate = Math.sqrt(Math.max(mn, this.legalMoves(WHITE).length) * Math.max(mn, this.legalMoves(BLACK).length));
         const depth = Math.max(3, Math.round(10 - 7 / 20 * b_estimate));
         return depth;
