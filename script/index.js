@@ -10,7 +10,7 @@ const checkSound = new Audio("https://images.chesscomfiles.com/chess-themes/soun
 const checkmateSound = new Audio("https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/game-end.mp3");
 const castleSound = new Audio("https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/castle.mp3");
 const promoteSound = new Audio("https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/promote.mp3");
-const copySound = new Audio("https://github.com/myst-6/sobriety/blob/main/copy.mp3");
+const copySound = new Audio("https://github.com/myst-6/sobriety/audio/main/copy.mp3");
 
 
 // create a div with a certain class name and textContent
