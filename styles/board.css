@@ -1,0 +1,113 @@
+.board {
+    user-select: none;
+    display: grid;
+    grid-template-rows: repeat(8, 1fr);
+    grid-template-columns: repeat(8, 1fr);
+    border: 2px solid white;
+    outline: 1em solid black;
+}
+
+.cell {
+    position: relative;
+    display: flex;
+    width: 8vh;
+    height: 8vh;
+}
+
+.cell:hover, .cell.over {
+    box-shadow: 0px 0px 0px 2px lightgray inset;
+    z-index: 2;
+}
+
+.cell.selected {
+    filter: drop-shadow(0px 0px 4px blue);
+    z-index: 3;
+}
+
+.letter {
+    position: absolute;
+    right: 0.75ch;
+    bottom: 0.5ch;
+}
+
+.number {
+    position: absolute;
+    left: 0.5ch;
+    top: 0.5ch;
+}
+
+.letter, .number {
+    text-shadow: 1px 1px 2px gray;
+    font-size: 0.5rem;
+}
+
+.black {
+    background-color: #2e2e2e;
+}
+
+.white {
+    background-color: #fccc74;
+}
+
+.black > .letter, .black > .number {
+    color: white;
+}
+
+.white > .letter, .white > .number {
+    color: black;
+}
+
+.piece {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.piece > img {
+    width: 65%;
+    cursor: grab;
+}
+
+.piece:active {
+    cursor: grabbing;
+}
+
+.king-turn {
+    filter: drop-shadow(0px 0px 4px white);
+    z-index: 3;
+}
+
+.king-check {
+    filter: drop-shadow(0px 0px 4px red);
+    z-index: 3;
+}
+
+.legal-move.black {
+    filter: drop-shadow(0px 0px 6px rgb(255, 255, 140) ) saturate(110%) brightness(170%);
+}
+
+.legal-move.white {
+    filter: drop-shadow(0px 0px 6px rgb(255, 255, 140) ) saturate(110%) brightness(115%);
+}
+
+.legal-move::after {
+    content: '';
+    width: 32%;
+    height: 32%;
+    position: absolute;
+    top: 34%;
+    left: 34%;
+    border-radius: 50%;
+    filter: blur(4px) opacity(0.6);
+    z-index: 5;
+}
+
+.legal-move.black::after {
+    background-color: gray;
+}
+
+.legal-move.white::after {
+    background-color: white;
+}

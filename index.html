@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <link href="./styles/index.css" rel="stylesheet" type="text/css" />
+    <link href="./styles/board.css" rel="stylesheet" type="text/css" />
+    <script src="./script/chess.js" defer></script>
+    <script src="./script/index.js" defer></script>
+    <title>Sobriety</title>
+    <link rel='icon' type='image/x-icon' href='./favicon.ico' />
+</head>
+<body>
+    <div class="background"></div>
+    <div class="all-content">
+        <div class="title">
+            <div id="title">
+                <span>S</span>
+                <span>O</span>
+                <span>B</span>
+                <span>R</span>
+                <span>I</span>
+                <span>E</span>
+                <span>T</span>
+                <span>Y</span>
+            </div>
+        </div>
+        <div class="subtitle">A chess AI designed to challenge beginners</div>
+        <div class="main-content">
+            <div class="board"></div>
+        </div>
+        <button class="compute-button" onclick="computerMove()">Computer Move</button>
+    </div>
+    <div class="extra-data">
+        <button onclick="flipBoard()">Flip Board</button>
+        <div>Turn: <span id="turn">White</span></div>
+        <div>Evaluation: <span id="eval">0.00</span></div>
+        <div>Material: <span id="material">0</span></div>
+        <div>Depth: <span id="depth">0</span></div>
+    </div>
+    <div class="move-list">
+        <div>Move List:</div>
+        <div id="movelist"></div>
+        <button class="undo" onclick="undoMove()">Undo Move</button>
+        <button class="copypgn" onclick="copyPGN()">Copy PGN</button>
+        <button class="loadpgn" onclick="loadPGN()">Load PGN</button>
+    </div>
+</body>
+</html>
