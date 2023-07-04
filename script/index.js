@@ -10,6 +10,8 @@ const checkSound = new Audio("https://images.chesscomfiles.com/chess-themes/soun
 const checkmateSound = new Audio("https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/game-end.mp3");
 const castleSound = new Audio("https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/castle.mp3");
 const promoteSound = new Audio("https://images.chesscomfiles.com/chess-themes/sounds/_MP3_/default/promote.mp3");
+const copySound = new Audio("https://github.com/myst-6/sobriety/blob/main/copy.mp3");
+
 
 // create a div with a certain class name and textContent
 function createDiv(className = "", textContent = "") {
@@ -271,14 +273,23 @@ function moveList(stack) {
             if (start[3] & TAKE) out += "x";
             out += Chess.ijCoord(end);
         }
-        if (start[3] & CHECK) {
-            if (i == stack.length-1 && new Chess(chessBoard).legalMoves(turn).length == 0) {   
+        if (start[3] & PROMOTION) {
+            out += "=Q";
+            if (i == stack.length-1) {
+                promoteSound.play();
+            }
+        }
+        if (i == stack.length-1 && new Chess(chessBoard).legalMoves(turn).length == 0) {   
+            if (start[3] & CHECK) {
                 out += "#";
                 start[3] |= CHECKMATE;
+            } else {
+                start[3] |= STALEMATE;
             }
-            else out += "+";
+        } else if (start[3] & CHECK) {
+            out += "+";
         }
-        if (counter % 2 == 1) out += "<br>";
+        if (counter % 2 == 1 && i != stack.length-1) out += "<br>";
         else out += " ";
         counter++;
     }
@@ -287,6 +298,15 @@ function moveList(stack) {
     if (stack[stack.length - 1][0][3] & CHECKMATE) {
         checkmateSound.play();
         setTimeout(() => chess.postMessage(["endGame"]), 500);
+        if (stack.length % 2) {
+            out += "1-0";
+        } else {
+            out += "0-1";
+        }
+    } else if (stack[stack.length - 1][0][3] & STALEMATE) {
+        // play stalemate sound
+        setTimeout(() => chess.postMessage(["endGame"]), 500);
+        out += "1/2-1/2";
     } else if (stack[stack.length - 1][0][3] & CHECK) {
         checkSound.play();
     } else if (stack[stack.length - 1][0][3] & TAKE) {
@@ -375,12 +395,21 @@ chess.onmessage = (ev) => {
     }
 
     if (f == "endGame") {
-        alert(`Checkmate, ${result % 2 == 0 ? "Black" : "White"} wins!`);
+        if (new Chess(chessBoard).inCheck(WHITE)) {
+            alert("Checkmate, Black wins!");
+            alert(`Checkmate, ${result % 2 == 0 ? "Black" : "White"} wins!`);
+        } else if (new Chess(chessBoard).inCheck(BLACK)) {
+            alert("Checkmate, White wins!");
+        } else {
+            alert("It's a draw!");
+        }
     }
 
     if (f == "copyPGN") {
-        const data = moveList(result).split("<br>").join("\n");
+        const data = document.querySelector("#movelist").innerHTML.split("<br>").join("\n");
         navigator.clipboard.writeText(data);
+        copySound.play();
+
     }
 };
 
